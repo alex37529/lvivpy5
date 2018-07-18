@@ -58,13 +58,17 @@ def process_request(link):
     try:
         if not urlparse(link).scheme:
             link = "http://" + link
-        respond = yield from aiohttp.get(link)
+        session = aiohttp.ClientSession()
+        resp = yield from session.get(link)
+        data = yield from resp.read()
+        print(data)
         try:
-            return respond.status
+            return resp.status
         finally:
-            respond.close()
+            resp.close()
     except asyncio.TimeoutError:
         return 500
+
 
 if __name__ == '__main__':
     logging.basicConfig(level='DEBUG', format="%(threadName)s: %(message)s")
